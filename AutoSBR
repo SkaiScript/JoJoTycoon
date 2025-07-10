@@ -1,0 +1,114 @@
+local Workspace = game:GetService("Workspace")
+local Players = game:GetService("Players")
+local TeleportService = game:GetService("TeleportService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local queueteleport = queue_on_teleport or (syn and syn.queue_on_teleport) or (fluxus and fluxus.queue_on_teleport)
+if queueteleport then
+	queueteleport("loadstring(game:HttpGet('', true))()")
+end
+
+local function deleteTargetObjects(parent)
+	local toDelete = {}
+	local function scan(obj)
+		local name = obj.Name:lower()
+		if name:find("anticheat") or name:find("exit") or name:find("start") or name:find("entrance") then
+			table.insert(toDelete, obj)
+		end
+		for _, child in ipairs(obj:GetChildren()) do
+			scan(child)
+		end
+	end
+	pcall(function()
+		scan(parent)
+		for _, obj in ipairs(toDelete) do
+			pcall(function()
+				obj:Destroy()
+			end)
+		end
+	end)
+end
+
+local function teleportToEnd()
+	local player = Players.LocalPlayer
+	local character = player.Character
+	local endPart = Workspace:FindFirstChild("End") and Workspace.End:FindFirstChild("End")
+	if character and character:FindFirstChild("HumanoidRootPart") and endPart then
+		pcall(function()
+			character.HumanoidRootPart.CFrame = endPart.CFrame
+		end)
+		return true
+	end
+	return false
+end
+
+local function teleportToPlace(placeId)
+	local player = Players.LocalPlayer
+	pcall(function()
+		TeleportService:Teleport(placeId, player)
+	end)
+end
+
+local function fireCreationRemote()
+	local creation = ReplicatedStorage:FindFirstChild("Creation")
+	if creation then
+		pcall(function()
+			creation:FireServer(20, "NONE", 1)
+		end)
+		task.wait(1)
+	end
+end
+
+local function cleanUpGui()
+	local player = Players.LocalPlayer
+	local gui = player:FindFirstChild("PlayerGui")
+	if gui then
+		local settingsGui = gui:FindFirstChild("SettingsGui")
+		if settingsGui then
+			pcall(function()
+				settingsGui:Destroy()
+			end)
+		end
+	end
+end
+
+local function main()
+	local player = Players.LocalPlayer
+	local playerGui = player:WaitForChild("PlayerGui", 5)
+
+	local playButton = playerGui:FindFirstChild("MainMenu") and playerGui.MainMenu:FindFirstChild("Play")
+	if playButton then
+		teleportToPlace(13251365504)
+		return
+	end
+
+	deleteTargetObjects(Workspace)
+	cleanUpGui()
+	fireCreationRemote()
+
+	local countdown = playerGui:FindFirstChild("Timer") and playerGui.Timer:FindFirstChild("Countdown")
+	while countdown and countdown.Visible do
+		task.wait(0.1)
+	end
+
+	if teleportToEnd() then
+		task.wait(1)
+		teleportToPlace(6278530225)
+	end
+end
+
+pcall(main)
+
+Workspace.ChildAdded:Connect(function(child)
+	task.wait()
+	pcall(function()
+		deleteTargetObjects(child)
+	end)
+end)
+
+local start = ReplicatedStorage:FindFirstChild("Start")
+if start then
+	pcall(function()
+		start:FireServer()
+	end)
+end
