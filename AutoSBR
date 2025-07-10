@@ -5,7 +5,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local queueteleport = queue_on_teleport or (syn and syn.queue_on_teleport) or (fluxus and fluxus.queue_on_teleport)
 if queueteleport then
-	queueteleport("loadstring(game:HttpGet('', true))()")
+	queueteleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/SkaiScript/JoJoTycoon/main/AutoSBR', true))()")
 end
 
 local function deleteTargetObjects(parent)
